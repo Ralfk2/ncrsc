@@ -1,12 +1,13 @@
-import libs.pyrs.comms
-import libs.pyrs.rpc
-import libs.pyrs.msgs
+import pyrs.comms
+import pyrs.rpc
+import pyrs.msgs
 import curses
 
 # Message Definitions.
-from libs.pyrs.proto import core_pb2
-from libs.pyrs.proto import peers_pb2
-from libs.pyrs.proto import system_pb2
+from pyrs.proto import core_pb2
+from pyrs.proto import peers_pb2
+from pyrs.proto import system_pb2
+from pyrs.proto import chat_pb2
 
 
 def print_status(sw, resp):
@@ -20,5 +21,5 @@ def print_status(sw, resp):
     
 def request_status(rs):
     rp = system_pb2.RequestSystemStatus();
-    msg_id = libs.pyrs.msgs.constructMsgId(core_pb2.CORE, core_pb2.SYSTEM, system_pb2.MsgId_RequestSystemStatus, False)
+    msg_id = pyrs.msgs.constructMsgId(core_pb2.CORE, core_pb2.CHAT, chat_pb2.MsgId_RequestRegisterEvents, False);
     return rs.request(msg_id, rp)

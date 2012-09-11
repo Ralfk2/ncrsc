@@ -1,8 +1,8 @@
 #!/usr/bin/python2.7
 
-import libs.pyrs.comms
-import libs.pyrs.rpc
-import libs.pyrs.msgs
+import pyrs.comms
+import pyrs.rpc
+import pyrs.msgs
 import curses
 import sys
 import time
@@ -18,7 +18,7 @@ timeout = 0.5
 debug_output = False
 
 # Construct a Msg Parser.
-parser = libs.pyrs.msgs.RpcMsgs()
+parser = pyrs.msgs.RpcMsgs()
 
 #init ncurses
 stdscr = curses.initscr()
@@ -28,9 +28,9 @@ stdscr.border(0); stdscr.keypad(1); curses.cbreak(); curses.noecho()
 stdscr.addstr(2, 2, "connecting to server...")
 stdscr.refresh()
 
-comms = libs.pyrs.comms.SSHcomms(username, password, host, port)
+comms = pyrs.comms.SSHcomms(username, password, host, port)
 comms.connect()
-rs = libs.pyrs.rpc.RsRpc(comms);
+rs = pyrs.rpc.RsRpc(comms);
 
 stdscr.clear()
 stdscr.border(0)
