@@ -9,16 +9,95 @@ import time
 
 #import ncrsc classes
 import status
+import download
+import upload
+import chat
 
-username='Ralfk'
-password='test1234'
-host='192.168.178.29'
-port=7022
-timeout = 0.5
-debug_output = False
+# Message Definitions.
+from pyrs.proto import core_pb2
+from pyrs.proto import system_pb2
+from pyrs.proto import chat_pb2
 
-# Construct a Msg Parser.
-parser = pyrs.msgs.RpcMsgs()
+import pyrs.test.auth
+
+auth = pyrs.test.auth.Auth()
+
+class MAIN(object):
+    def __init__(self, stdscr, comms):
+        # Construct a Msg Parser.
+        self.TIMEOUT = 0.5
+        self.parser = pyrs.msgs.RpcMsgs()
+        self.rs = pyrs.rpc.RsRpc(comms)
+        self.stdscr = stdscr
+        self.comms = comms
+        self.t = time.time()
+        self.my,self.mx = self.stdscr.getmaxyx()
+        self.statuswin = curses.newwin(7, self.mx-4, 1, 2); self.statuswin.border(0)
+        self.statuswin.refresh()
+        self.chatEvent_msgid = pyrs.msgs.constructMsgId(core_pb2.CORE, core_pb2.CHAT, chat_pb2.MsgId_EventChatMessage, True);
+        
+        #construct children
+        self.children = []
+        self.children.append([download.Menu(self.stdscr, self.rs, self.parser, self), curses.KEY_F2]) #download menu
+        self.children.append([upload.Menu(self.stdscr, self.rs, self.parser, self), curses.KEY_F3]) #upload menu
+        self.children.append([chat.Menu(self.stdscr, self.rs, self.parser, self), curses.KEY_F4]) #chat menu
+        #set active_child to default child - for now this is chat
+        self.active_child = self.children[2]
+        self.build_menu()
+    def tick(self):
+        while True:
+            c = stdscr.getch()
+            if self.t-time.time() < -2 : 
+                status_req = status.request_status(self.rs)
+                
+                # Now iterate through all the responses.
+                (msg_id, msg_body) = self.rs.response(status_req, self.TIMEOUT)
+                if msg_body :
+                    resp = self.parser.construct(msg_id, msg_body)
+                    if resp :
+                        status.print_status(self.statuswin,resp)
+                self.active_child[0].tick()
+                self.t = time.time()
+            if c == ord('q'): break     #exit while
+            elif self.menu_key(c):
+                self.active_child[0].menu_key(c)
+            time.sleep(0.5)
+            #if c >= ord('0') and c <= ord('9'): self.chat.enter_leave_lobby(c)
+            #elif c == ord('n'): self.chat.change_name()
+    def rs_response(self, req, i=0):
+        resp = self.rs.response(req, self.TIMEOUT)
+        if resp == None:
+            time.sleep(5)
+            if i == 20: return resp                 # ther server did probably die
+            return self.rs_response(req, i+1)
+        return resp
+    def menu_key(self, c):
+        for child in self.children:
+            if c == child[1]:
+                self.active_child[0].end()
+                self.active_child = child
+                self.build_menu()
+                return False
+        return True
+    def build_menu(self):
+        self.statuswin.addstr(4, 1, "")  #set cursor position
+        for child in self.children:
+            atr = curses.A_NORMAL
+            if child[1] == self.active_child[1]: atr = curses.A_BOLD
+            self.statuswin.addstr(self.get_key_string(child[1])+": "+child[0].title+" ", atr)
+        self.statuswin.addstr("q: exit")
+        self.statuswin.refresh()
+    def get_key_string(self, c):
+        if c == curses.KEY_F1: return "F1"
+        elif c == curses.KEY_F2: return "F2"
+        elif c == curses.KEY_F3: return "F3"
+        elif c == curses.KEY_F4: return "F4"
+        elif c == curses.KEY_F5: return "F5"
+        elif c == curses.KEY_F6: return "F6"
+        elif c == curses.KEY_F7: return "F7"
+        elif c == curses.KEY_F8: return "F8"
+        elif c == curses.KEY_F9: return "F9"
+        else: return "unknown"
 
 #init ncurses
 stdscr = curses.initscr()
@@ -28,33 +107,26 @@ stdscr.border(0); stdscr.keypad(1); curses.cbreak(); curses.noecho()
 stdscr.addstr(2, 2, "connecting to server...")
 stdscr.refresh()
 
-comms = pyrs.comms.SSHcomms(username, password, host, port)
+comms = pyrs.comms.SSHcomms(auth.user, auth.pwd, auth.host, auth.port)
 comms.connect()
-rs = pyrs.rpc.RsRpc(comms);
 
 stdscr.clear()
 stdscr.border(0)
-my,mx = stdscr.getmaxyx()
-statuswin = curses.newwin(6, mx-4, 1, 2); statuswin.border(0)
-
 stdscr.nodelay(1)
+main = MAIN(stdscr, comms)
+
 try:
-    
-    while stdscr.getch() == curses.ERR:     #loop till user presses some key
-        status_req = status.request_status(rs)
-        time.sleep(0.5)
-        
-        # Now iterate through all the responses.
-        (msg_id, msg_body) = rs.response(status_req, timeout)
-        if msg_body :
-            resp = parser.construct(msg_id, msg_body)
-            if resp :
-                status.print_status(statuswin,resp)
+    main.tick()
+
 except:  
-   comms.close()  
    e = sys.exc_info()
+   stdscr.addstr(20, 2, str(e))
+   time.sleep(1.5)
+   curses.nocbreak(); stdscr.keypad(0); curses.echo()
    curses.endwin()
    print e
+   import pdb; pdb.post_mortem(e[2])
+   comms.close()  
 
 curses.nocbreak(); stdscr.keypad(0); curses.echo()   #leave terminal in "normal" mode
 comms.close()
