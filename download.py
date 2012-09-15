@@ -30,7 +30,7 @@ class Menu(object):
     def menu_key(self, c):
         if c == curses.KEY_DOWN:
             self.scroll += 5
-        elif c == curses.KEY_DOWN:
+        elif c == curses.KEY_UP:
             self.scroll -= 5
             if self.scroll < 0: self.scroll = 0
         return True
@@ -53,6 +53,8 @@ class Menu(object):
                 self.scroll -= self.my-(i+2-self.scroll)
                 if self.scroll < 0: self.scroll = 0
         else:
+            self.__nc_window.erase()
+            self.__nc_window.border(0)
             self.__nc_window.addstr(1, 1, "no active Downloads")
         self.__nc_window.refresh()
         

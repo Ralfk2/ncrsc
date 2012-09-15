@@ -45,11 +45,16 @@ class MAIN(object):
         self.active_child = self.children[2]
         self.build_menu()
     def tick(self):
-        while True:
-            c = stdscr.getch()
-            if c == ord('q'): break     #exit while
-            elif self.menu_key(c):
-                self.active_child[0].menu_key(c)
+        loop = True
+        while loop:
+            t=time.time()
+            while t-time.time() > -0.2:
+                c = stdscr.getch()
+                if c == ord('q'): 
+                    loop = False
+                    break               #exit while
+                elif self.menu_key(c):
+                    self.active_child[0].menu_key(c)
                 
             if self.t-time.time() < -0.5 : 
                 status_req = status.request_status(self.rs)
@@ -64,7 +69,6 @@ class MAIN(object):
                 self.t = time.time()
             else:
                 self.active_child[0].tick()
-            time.sleep(0.2)
             #if c >= ord('0') and c <= ord('9'): self.chat.enter_leave_lobby(c)
             #elif c == ord('n'): self.chat.change_name()
     def rs_response(self, req, i=0):
