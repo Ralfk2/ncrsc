@@ -36,7 +36,7 @@ class Menu(object):
         return True
     def print_active_uploads(self, update=False):
         if update: self.transfers = self.list_downloads()
-        if transfers:
+        if self.transfers:
             self.__nc_window.erase()
             self.__nc_window.border(0)
             i=1
