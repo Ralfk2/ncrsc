@@ -47,7 +47,11 @@ class MAIN(object):
     def tick(self):
         while True:
             c = stdscr.getch()
-            if self.t-time.time() < -2 : 
+            if c == ord('q'): break     #exit while
+            elif self.menu_key(c):
+                self.active_child[0].menu_key(c)
+                
+            if self.t-time.time() < -0.5 : 
                 status_req = status.request_status(self.rs)
                 
                 # Now iterate through all the responses.
@@ -56,12 +60,11 @@ class MAIN(object):
                     resp = self.parser.construct(msg_id, msg_body)
                     if resp :
                         status.print_status(self.statuswin,resp)
-                self.active_child[0].tick()
+                self.active_child[0].tick(True)
                 self.t = time.time()
-            if c == ord('q'): break     #exit while
-            elif self.menu_key(c):
-                self.active_child[0].menu_key(c)
-            time.sleep(0.5)
+            else:
+                self.active_child[0].tick()
+            time.sleep(0.2)
             #if c >= ord('0') and c <= ord('9'): self.chat.enter_leave_lobby(c)
             #elif c == ord('n'): self.chat.change_name()
     def rs_response(self, req, i=0):

@@ -22,9 +22,10 @@ class Menu(object):
         self.__rp = chat_pb2.RequestChatLobbies()
         self.__rp.lobby_set = chat_pb2.RequestChatLobbies.LOBBYSET_ALL
         self.parent = parent
+        self.lobbies = False
         #self.chat_register_id = self.__rs_rpc.request(pyrs.msgs.constructMsgId(core_pb2.CORE, core_pb2.CHAT, chat_pb2.MsgId_RequestRegisterEvents, False), self.__rp)
-    def tick(self):
-        self.cur_funct()
+    def tick(self, update=False):
+        self.cur_funct(update)
     def blubb(self):
         msg_id = pyrs.msgs.constructMsgId(core_pb2.CORE, core_pb2.CHAT, chat_pb2.MsgId_RequestRegisterEvents, False);
         #msg_id = pyrs.msgs.constructMsgId(core_pb2.CORE, core_pb2.CHAT, chat_pb2.MsgId_EventChatMessage, True);
@@ -56,14 +57,14 @@ class Menu(object):
                 return  resp.lobbies
             else : return False
 
-    def print_lobbies(self):
-        lobbies = self.list_lobbies()
-        if lobbies:
+    def print_lobbies(self, update=False):
+        if update: self.lobbies = self.list_lobbies()
+        if self.lobbies:
             self.__nc_window.erase()
             self.__nc_window.border(0)
             self.__nc_window.addstr(1, 1, "Public lobbies:")
             i=0
-            for lobby in lobbies:
+            for lobby in self.lobbies:
                 if i+3 < self.my:
                     atr = curses.A_NORMAL
                     if lobby.lobby_state == chat_pb2.ChatLobbyInfo.LOBBYSTATE_JOINED : atr = curses.A_BOLD
