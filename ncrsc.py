@@ -9,6 +9,7 @@ import time
 
 #import ncrsc classes
 import status
+import nhelp
 import download
 import upload
 import chat
@@ -38,11 +39,12 @@ class MAIN(object):
         
         #construct children
         self.children = []
+        self.children.append([nhelp.Menu(self.stdscr, self), curses.KEY_F1]) #help menu
         self.children.append([download.Menu(self.stdscr, self.rs, self.parser, self), curses.KEY_F2]) #download menu
         self.children.append([upload.Menu(self.stdscr, self.rs, self.parser, self), curses.KEY_F3]) #upload menu
         self.children.append([chat.Menu(self.stdscr, self.rs, self.parser, self), curses.KEY_F4]) #chat menu
-        #set active_child to default child - for now this is chat
-        self.active_child = self.children[2]
+        #set active_child to help menu
+        self.active_child = self.children[0]
         self.build_menu()
     def tick(self):
         loop = True

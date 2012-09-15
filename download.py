@@ -69,3 +69,6 @@ class Menu(object):
             if resp.status.code == core_pb2.Status.SUCCESS:
                 return  resp.transfers
             else : return False
+    def get_help(self):
+        help_list = ["   move up/down with your arrow keys"]
+        return help_list

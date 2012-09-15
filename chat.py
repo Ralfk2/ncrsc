@@ -125,3 +125,6 @@ class Menu(object):
                 return resp.status.code == core_pb2.Status.SUCCESS
             return False
         return True
+    def get_help(self):
+        help_list = ["   enter/leave lobbies by pressing the number in front of them (0-9)", "   press 'n' to change your name (does not work yet)"]
+        return help_list
