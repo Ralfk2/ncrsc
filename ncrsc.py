@@ -79,12 +79,25 @@ class MAIN(object):
             return self.rs_response(req, i+1)
         return resp
     def menu_key(self, c):
+        i = 0
         for child in self.children:
             if c == child[1]:
                 self.active_child[0].end()
                 self.active_child = child
                 self.build_menu()
                 return False
+            elif child[1] == self.active_child[1]:
+                if c == curses.KEY_LEFT and i > 0:
+                    self.active_child[0].end()
+                    self.active_child = self.children[i-1]
+                    self.build_menu()
+                    return False
+                elif c == curses.KEY_RIGHT and i+1 < len(self.children):
+                    self.active_child[0].end()
+                    self.active_child = self.children[i+1]
+                    self.build_menu()
+                    return False
+            i += 1
         return True
     def build_menu(self):
         self.statuswin.addstr(4, 1, "")  #set cursor position
