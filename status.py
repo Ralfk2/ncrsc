@@ -9,12 +9,13 @@ from pyrs.proto import system_pb2
 
 
 def print_status(sw, resp):
-    #sw.erase()
     sw.border(0)
     sw.addstr(1, 1, "Ncurses Retroshare Control Terminal v0.1")
     if resp.status.code == core_pb2.Status.SUCCESS:
+        sw.move(2, 1; sw.clrtoeol()
         sw.addstr(2, 1, "Friends "+str(resp.no_connected)+" / "+str(resp.no_peers))
         sw.addstr(2, 25, "Network: "+get_status_string(resp.net_status))
+        sw.move(3, 1; sw.clrtoeol()
         sw.addstr(3, 1, "Down: "+str(round(resp.bw_total.down,2)))
         sw.addstr(3, 25, "Up: "+str(round(resp.bw_total.up,2)))
     else:

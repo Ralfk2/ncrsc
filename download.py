@@ -44,8 +44,11 @@ class Menu(object):
                 if i > self.scroll:
                     if i+2-self.scroll < self.my:
                         self.__nc_window.addstr(1+i-self.scroll, 1, str(i)+": name: "+transfer.file.name.encode("utf-8"))
+                        self.__nc_window.move(1+i-self.scroll, int(self.mx/3.)+5); self.__nc_window.clrtoeol()
                         self.__nc_window.addstr(1+i-self.scroll, int(self.mx/3.)+5, "size: "+str(transfer.file.size/1024)+" kB")
+                        self.__nc_window.move(1+i-self.scroll, int(self.mx/2.)); self.__nc_window.clrtoeol()
                         self.__nc_window.addstr(1+i-self.scroll, int(self.mx/2.), str(round(transfer.fraction*100,2))+"% finished")
+                        self.__nc_window.move(1+i-self.scroll, int(2*self.mx/3.)); self.__nc_window.clrtoeol()
                         self.__nc_window.addstr(1+i-self.scroll, int(2*self.mx/3.), "rate: "+str(round(transfer.rate_kBs,2))+" kB/s")
                 i+=1
             self.__nc_window.addstr(1, 1, "active Downloads ("+str(self.scroll)+"/"+str(i-1)+"):")
