@@ -9,7 +9,6 @@ from pyrs.proto import system_pb2
 
 
 def print_status(sw, resp):
-    sw.border(0)
     sw.addstr(1, 1, "Ncurses Retroshare Control Terminal v0.1")
     if resp.status.code == core_pb2.Status.SUCCESS:
         sw.move(2, 1); sw.clrtoeol()
@@ -20,6 +19,7 @@ def print_status(sw, resp):
         sw.addstr(3, 25, "Up: "+str(round(resp.bw_total.up,2)))
     else:
         sw.addstr(2, 1, "code: "+str(resp.status.code))
+    sw.border(0)
     sw.refresh()
     
 def request_status(rs):

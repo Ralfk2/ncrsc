@@ -38,7 +38,6 @@ class Menu(object):
         if update: self.transfers = self.list_downloads()
         if self.transfers:
             self.__nc_window.erase()
-            self.__nc_window.border(0)
             i=1
             for transfer in self.transfers:
                 if i > self.scroll:
@@ -57,8 +56,8 @@ class Menu(object):
                 if self.scroll < 0: self.scroll = 0
         else:
             self.__nc_window.erase()
-            self.__nc_window.border(0)
             self.__nc_window.addstr(1, 1, "no active Downloads")
+        self.__nc_window.border(0)
         self.__nc_window.refresh()
         
     def list_downloads(self):
